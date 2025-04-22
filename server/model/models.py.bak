@@ -1,0 +1,272 @@
+"""
+models.py - 综合模型文件
+将所有相互依赖的模型集中定义在一个文件中，以避免循环导入问题
+
+该文件包括:
+- 基础API模型 (ApiKey等)
+- 用户相关模型 (User等)
+- 聊天相关模型 (ChatDB, chat_model等)
+- 邮件相关模型 (Email等)
+- 配置相关模型 (Config等)
+"""
+from __future__ import annotations
+from pydantic import BaseModel, EmailStr
+from sqlmodel import SQLModel, Field, Relationship
+from typing import Optional, List, Dict, Any
+from datetime import datetime
+import uuid
+import json
+
+#############################################
+# API相关模型
+#############################################
+class ApiKey(SQLModel, table=True):
+    __tablename__ = "apikey"
+    __table_args__ = {'extend_existing': True}
+    id: int = Field(default=None, primary_key=True)
+    api_name: str = Field(unique=True)
+    api_key: str
+    api_model_json: str = Field(default="[]")
+    api_url: Optional[str] = None
+    base_url: Optional[str] = None
+    
+    @property
+    def api_model(self) -> List[str]:
+        return json.loads(self.api_model_json)
+    
+    @api_model.setter
+    def api_model(self, value: List[str]):
+        self.api_model_json = json.dumps(value)
+
+class ApiModel(BaseModel):
+    api_name: str
+    api_key: str
+    api_model: List[str]
+    api_url: Optional[str] = ""
+    base_url: Optional[str] = ""
+
+class UpdateApiModel(BaseModel):
+    id: int
+    api_name: str
+    api_key: str
+    api_model: List[str]
+    api_url: Optional[str] = ""
+    base_url: Optional[str] = ""
+
+#############################################
+# 用户相关模型
+#############################################
+class UserDB(BaseModel):
+    username: str
+    email: str
+    hashed_password: str
+
+class UserReg(BaseModel):
+    username: str
+    email: str
+    code: str
+    password: str
+
+class User(SQLModel, table=True):
+    __tablename__ = "user"
+    __table_args__ = {'extend_existing': True}
+    
+    id: int = Field(default=None, primary_key=True)
+    username: str = Field(unique=True)
+    email: str = Field(unique=True)
+    hashed_password: str
+    money: int
+    userauth: int
+    
+    # 使用字符串类型注解解决循环导入
+    chats: List["ChatDB"] = Relationship(back_populates="user")
+    chatConfig: List["chatConfig"] = Relationship(back_populates="user")
+
+class Users(SQLModel):
+    __tablename__ = "user"
+    
+    id: int = Field(default=None, primary_key=True)
+    username: str = Field(unique=True)
+    email: str = Field(unique=True)
+    hashed_password: str
+    money: int
+    userauth: int
+
+class Email(SQLModel, table=True):
+    id: int = Field(default=None, primary_key=True)
+    smtp_server: str
+    sender: str
+    user: str
+    port: int
+    passwd: str
+
+class EmailConfig(SQLModel):
+    smtp_server: str
+    sender: str
+    user: str
+    port: int
+
+class TokenData(BaseModel):
+    username: str | None = None
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+class UpdateUser(BaseModel):
+    username: str 
+    email: str
+    password: str
+    money: int
+    userauth: int
+
+class UserUpdateRequest(BaseModel):
+    username: str
+    current_password: str = None
+    new_password: str = None
+
+class EmailRequest(BaseModel):
+    email: EmailStr
+
+#############################################
+# 聊天相关模型
+#############################################
+class ChatConfig(BaseModel):
+    message_max: int
+    model_name: str
+    api_name: str
+    
+    class Config:
+        protected_namespaces = ()
+
+class chatConfig(SQLModel, table=True):
+    __tablename__ = "chatconfig"
+    __table_args__ = {'extend_existing': True}
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()), primary_key=True)
+    message_max: int
+    model_name: str
+    api_name: str
+    username: str = Field(foreign_key="user.username")
+    
+    user: Optional["User"] = Relationship(back_populates="chatConfig")
+    
+    class Config:
+        protected_namespaces = ()
+
+class HS_message(BaseModel):
+    id: str
+    isuser: bool
+    content: str
+
+class chat_model(BaseModel):
+    username: str
+    model_name: str  # 模型名称
+    api_name: str    # API类型名称
+    history_message: list[HS_message]
+    message: str
+    conversationId: str
+    filelist_id: list[str]
+    
+    class Config:
+        protected_namespaces = ()
+
+class Delete_all(BaseModel):
+    username: str
+
+class Create_chat(BaseModel):
+    username: str
+    title: str
+
+class Delete_chat(BaseModel):
+    username: str
+    conversationId: str
+
+class Update_chat(BaseModel):
+    username: str
+    conversationId: str
+    newtitle: str
+
+class Create_message(BaseModel):
+    username: str
+    message: str
+    isuser: bool
+    conversationId: str
+
+class Delete_message(BaseModel):
+    username: str
+    messageId: str
+
+class Update_message(BaseModel):
+    username: str
+    message: str
+    messageId: str
+
+class ChatDB(SQLModel, table=True):
+    __tablename__ = "chat"
+    __table_args__ = {'extend_existing': True}
+    
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()), primary_key=True)
+    title: str
+    createdAt: datetime
+
+    username: str = Field(foreign_key="user.username")
+    
+    user: Optional["User"] = Relationship(back_populates="chats")
+    messages: List["ChatMessageDB"] = Relationship(back_populates="chat")
+
+class ChatMessageDB(SQLModel, table=True):
+    __tablename__ = "chatmessages"
+    __table_args__ = {'extend_existing': True}
+
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()), primary_key=True)
+    isuser: bool
+    content: str
+
+    chat_id: Optional[str] = Field(default=None, foreign_key="chat.id")
+    
+    chat: Optional["ChatDB"] = Relationship(back_populates="messages")
+
+#############################################
+# 前端响应模型
+#############################################
+class ChatMessageResponse(BaseModel):
+    id: str
+    isuser: bool
+    content: str
+
+class ChatItemResponse(BaseModel):
+    id: str
+    username: str
+    title: str
+    createdAt: datetime
+    chatmessages: List[ChatMessageResponse] = []
+
+class Userinfo(BaseModel):
+    id: int
+    username: str
+    email: str
+    money: int
+    userauth: int
+
+class UserResponse(BaseModel):
+    userinfo: Userinfo
+    chats: List[ChatItemResponse] = []
+
+class LoginResponse(BaseModel):
+    token: Token
+    user: UserResponse
+
+#############################################
+# 系统配置模型
+#############################################
+class Config(SQLModel, table=True):
+    __tablename__ = "config"
+    id: int = Field(default=None, primary_key=True)
+    email_register: bool
+    title: str
+    guest: bool
+
+class ApiResponse(BaseModel):
+    code: int
+    msg: str
+    data: Any = None

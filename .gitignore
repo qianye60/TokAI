@@ -1,0 +1,24 @@
+# 依赖目录
+node_modules/
+# 缓存文件
+__pycache__/
+*.py[cod]
+
+# 虚拟环境
+venv/
+env/
+
+# 缓存文件
+__pycache__/
+*.py[cod]
+*.class
+.pytest_cache/
+
+# 数据库文件
+*.db
+*.sqlite3
+
+# 依赖目录
+node_modules/
+.idea/
+.vscode/

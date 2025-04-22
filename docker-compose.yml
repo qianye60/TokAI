@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  backend:
+    image: qianye60/tokai-backend:latest  # 使用远程镜像
+    container_name: tokai-backend
+    ports:
+      - "40000:40000"
+    volumes:
+      - ./server/data:/app/data
+      - ./server/temp:/app/temp
+    restart: unless-stopped
+
+  frontend:
+    image: qianye60/tokai-frontend:latest  # 使用远程镜像
+    container_name: tokai-frontend
+    ports:
+      - "40001:80"
+    depends_on:
+      - backend
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    restart: unless-stopped

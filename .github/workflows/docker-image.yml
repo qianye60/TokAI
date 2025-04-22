@@ -1,0 +1,61 @@
+name: 自动构建前后端镜像
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 配置 Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: 登录 Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      # ---------- 后端镜像构建 ----------
+      - name: 生成后端镜像标签
+        id: backend-tags
+        run: |
+          TIMESTAMP=$(date +'%Y%m%d-%H%M%S')
+          COMMIT_SHA_SHORT=$(echo $GITHUB_SHA | cut -c1-7)
+          echo "tags=qianye60/tokai-backend:latest,qianye60/tokai-backend:$TIMESTAMP,qianye60/tokai-backend:$COMMIT_SHA_SHORT" >> $GITHUB_OUTPUT
+
+      - name: 构建并推送后端镜像
+        uses: docker/build-push-action@v6
+        with:
+          context: ./server
+          file: ./server/Dockerfile
+          push: true
+          tags: ${{ steps.backend-tags.outputs.tags }}
+          platforms: linux/amd64
+          cache-from: type=registry,ref=qianye60/tokai-backend:buildcache-backend
+          cache-to: type=registry,ref=qianye60/tokai-backend:buildcache-backend,mode=max,ignore-error=true
+
+      # ---------- 前端镜像构建 ----------
+      - name: 生成前端镜像标签
+        id: frontend-tags
+        run: |
+          TIMESTAMP=$(date +'%Y%m%d-%H%M%S')
+          COMMIT_SHA_SHORT=$(echo $GITHUB_SHA | cut -c1-7)
+          echo "tags=qianye60/tokai-frontend:latest,qianye60/tokai-frontend:$TIMESTAMP,qianye60/tokai-frontend:$COMMIT_SHA_SHORT" >> $GITHUB_OUTPUT
+
+      - name: 构建并推送前端镜像
+        uses: docker/build-push-action@v6
+        with:
+          context: ./Vue3
+          file: ./Vue3/Dockerfile  # 确保此Dockerfile已包含权限修复
+          push: true
+          tags: ${{ steps.frontend-tags.outputs.tags }}
+          platforms: linux/amd64
+          cache-from: type=registry,ref=qianye60/tokai-frontend:buildcache-frontend
+          cache-to: type=registry,ref=qianye60/tokai-frontend:buildcache-frontend,mode=max,ignore-error=true
+          
