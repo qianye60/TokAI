@@ -6,7 +6,7 @@ from model.api_model import ApiKey
 from model.chat_model import chat_model
 from model.user_model import User
 from sqlite.db_config import get_session
-from sqlalchemy import select, text
+from sqlmodel import select
 
 async def new_api(username,headers, json_data, api: ApiKey):
     timeout = httpx.Timeout(60.0)
@@ -14,23 +14,12 @@ async def new_api(username,headers, json_data, api: ApiKey):
 
     async with httpx.AsyncClient(timeout=timeout) as client:
         try:
-            # 使用显式的Session并检查查询结果
-            session = next(get_session())
-
-            # 先检查用户是否存在
-            stmt = select(User).where(User.username == username)
-            user = session.exec(stmt).first()
-
-            # 检查用户是否存在及其属性
-            if not user:
-                raise ValueError(f"找不到用户: {username}")
-
             try:
-                if hasattr(user, "__dict__"):
-                    print(f"用户属性: {user.__dict__}")
-                # 使用getattr安全访问money字段
-                current_money = getattr(user, 'money', None)
-                print(f"当前余额: {current_money}")
+                # 使用显式的Session并检查查询结果
+                session = next(get_session())
+
+                user = session.exec(select(User).where(User.username == username)).first()
+
             except Exception as e:
                 print(f"访问用户属性失败: {str(e)}")
             async with client.stream('POST', api.api_url,
@@ -72,19 +61,12 @@ async def new_api(username,headers, json_data, api: ApiKey):
 
                             # 计算扣除的金额 (使用更合理的比例，1000 tokens 花费 0.01 单位)
                             cost = total_tokens / 100000
-
+                            original_money = float(user.money)
                             # 安全地访问money属性
                             try:
-                                # 刷新用户数据
-                                user_refresh = session.exec(select(User).where(User.username == username)).first()
-                                if not user_refresh:
-                                    raise ValueError(f"无法刷新用户数据: {username}")
-
-                                # 获取当前余额并确保是浮点数
-                                original_money = float(user_refresh.money) if hasattr(user_refresh, 'money') else 0.0
                                 new_money = round(original_money - cost, 4)  # 保留4位小数
-                                user_refresh.money = new_money
-                                session.add(user_refresh)
+                                user.money = new_money
+                                session.add(user)
                                 session.commit()
 
                             except Exception as money_ex:
@@ -105,9 +87,8 @@ async def new_api(username,headers, json_data, api: ApiKey):
 
                             # 安全回退：确保至少扣除最小费用
                             try:
-                                # 使用原始SQL直接执行最小扣除
-                                min_update = text("UPDATE user SET money = money - 0.0001 WHERE username = :username")
-                                session.execute(min_update, params={"username": username})
+                                user.money = user.money - 0.001
+                                session.add(user)
                                 session.commit()
                             except Exception as money_ex:
                                 print(f"最小扣款失败: {str(money_ex)}")
