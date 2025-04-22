@@ -38,13 +38,12 @@ TokAI 是一个现代化的全栈智能对话助手应用，提供流畅的对�
 
 ### 使用 Docker Compose (推荐)
 
-1.  确保你的机器上安装了 Docker 和 Docker Compose。
-2.  在项目根目录下，找到 `docker-compose.yml` 文件。
-3.  根据需要修改 `.env` 文件（如果 `docker-compose.yml` 中使用了环境变量）或直接修改 `docker-compose.yml` 中的配置（例如端口映射）。
-4.  在项目根目录下打开终端，运行以下命令：
+1.  在项目根目录下，找到 `docker-compose.yml` 文件。
+2.  根据需要修改 `.env` 文件（如果 `docker-compose.yml` 中使用了环境变量）或直接修改 `docker-compose.yml` 中的配置（例如端口映射）。
+3.  在项目根目录下打开终端，运行以下命令：
 
     ```bash
-    # 下载docker-compose.yaml，在所在目录下执行下面命令部署
+    # 一键部署
     docker-compose up -d
 
     # 查看运行状态
