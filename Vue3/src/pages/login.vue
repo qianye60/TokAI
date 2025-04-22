@@ -178,6 +178,8 @@ import { useUserConfig } from "@/store/dataconfig.ts"
 import { useConversationStore } from "@/store/dataconfig.ts"
 import { useRouter } from "vue-router";
 import { message } from "ant-design-vue";
+import { onMounted } from "vue";
+
 // 表单数据
 let dataUserName = ref(''); // 用户名
 let dataPassword = ref(''); // 密码
@@ -217,6 +219,12 @@ const systemConfig = useSystemConfig();
 const userConfig = useUserConfig();
 const router = useRouter();
 
+
+
+onMounted(async ()=>{
+  const response = await axios.get(systemConfig.baseurl + '/admin/config')
+  systemConfig.emailregister = response.data.email_register;
+})
 // 获取验证码
 async function sendVerificationCode() {
   if (!isValidEmail.value) return;
