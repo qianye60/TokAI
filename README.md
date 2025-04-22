@@ -109,7 +109,7 @@ TokAI 是一个现代化的全栈智能对话助手应用，提供流畅的对�
 -   **框架**：FastAPI (Python)
 -   **数据库**：SQLite
 -   **身份验证**：JWT
--   **API中继**：支持转发到OpenAI、Google等AI服务提供商
+-   **API中继**：支持转发到 New-api AI服务提供商
 -   **服务器**：Uvicorn
 
 ### 部署
