@@ -9,7 +9,13 @@ TokAI 是一个现代化的全栈智能对话助手应用，提供流畅的对�
 - **admin**
 - **123456**
 ### 登陆后记得修改账号密码
-  
+
+## 图片展示
+![image](https://github.com/user-attachments/assets/8281abb7-86e0-40f7-90fa-8d940ba8be09)
+![image](https://github.com/user-attachments/assets/f9c3732a-fcb4-4834-8891-207f8e692b49)
+![image](https://github.com/user-attachments/assets/47b02a2a-86a3-42eb-8ce6-06a41a53d553)
+
+
 ## 功能特点
 
 -   🎨 **主题定制**
