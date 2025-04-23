@@ -478,6 +478,7 @@ const deleteUser = async (userId: number) => {
     flex-direction: column;
     gap: 1rem;
     padding-top: 1.5rem; /* 顶部与顶端的距离 */
+    overflow-y: auto; /* 添加垂直滚动条 */
 }
 
 /* 标题和搜索区域 - 水平排列 */
@@ -486,6 +487,7 @@ const deleteUser = async (userId: number) => {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1.5rem;
+    padding: 0 1rem;
 }
 .admin-footer {
     position: absolute;
@@ -543,7 +545,10 @@ const deleteUser = async (userId: number) => {
     overflow-x: auto; /* 允许水平滚动 */
     background-color: var(--background-color);
     border-radius: 8px;
-    box-shadow: 0 0 8px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.2);
+    margin-bottom: 1rem;
+    max-height: calc(100vh - 220px); /* 设置最大高度，确保在小屏幕上也能滚动 */
+    overflow-y: auto; /* 垂直滚动 */
 }
 
 /* 表格基本样式 */
@@ -552,6 +557,7 @@ const deleteUser = async (userId: number) => {
     border-collapse: collapse;
     text-align: left;
     color: var(--text-color, #fff);
+    table-layout: fixed; /* 固定表格布局，提高性能 */
 }
 /* 表头单元格样式 */
 .user-table th {
@@ -559,6 +565,9 @@ const deleteUser = async (userId: number) => {
     background-color: var(--header-bg, rgba(0, 0, 0, 0.1)); /* 更柔和的背景 */
     font-weight: 600;
     border-bottom: 1px solid var(--border-color, #444);
+    position: sticky; /* 固定表头 */
+    top: 0;
+    z-index: 10;
 }
 
 /* 数据单元格样式 */
@@ -638,16 +647,19 @@ const deleteUser = async (userId: number) => {
 .action-buttons {
     display: flex;
     gap: 0.5rem;
+    flex-wrap: wrap; /* 允许按钮在小屏幕上换行 */
 }
 
 /* 按钮基本样式 */
 .btn {
-    padding: 0.3rem 0.6rem;
+    padding: 0.5rem 1rem;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    font-size: 0.8rem;
+    font-size: 0.85rem;
+    font-weight: 500;
     transition: all 0.2s;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
 /* 编辑按钮样式 */
@@ -659,6 +671,7 @@ const deleteUser = async (userId: number) => {
 /* 编辑按钮悬停效果 */
 .edit-btn:hover {
     background-color: var(--edit-btn-hover, #0b5ed7);
+    transform: translateY(-1px);
 }
 
 /* 删除按钮样式 */
@@ -670,14 +683,17 @@ const deleteUser = async (userId: number) => {
 /* 删除按钮悬停效果 */
 .delete-btn:hover {
     background-color: var(--delete-btn-hover, #bb2d3b);
+    transform: translateY(-1px);
 }
 
 /* 分页控件容器 */
 .pagination {
     display: flex;
     justify-content: center;
+    flex-wrap: wrap; /* 允许在小屏幕上换行 */
     gap: 0.3rem;
-    margin-top: 1rem;
+    margin: 1rem 0 2rem 0;
+    padding: 0.5rem;
 }
 
 /* 分页按钮样式 */
@@ -713,20 +729,37 @@ const deleteUser = async (userId: number) => {
 @media (max-width: 768px) {
     /* 小屏幕上标题和搜索框垂直排列 */
     .user-header {
-        padding-left: 1rem;
-        justify-content: center;
         flex-direction: column;
         align-items: stretch;
+        gap: 1rem;
+    }
+    
+    .search-actions {
+        display: flex;
+        flex-direction: column;
         gap: 0.8rem;
     }
     
     .search-input {
-        width: 80%;
+        width: 100%;
     }
     
-    /* 小屏幕上操作按钮垂直排列 */
+    /* 调整表格在移动设备上的显示 */
+    .user-table th, 
+    .user-table td {
+        padding: 0.8rem 0.5rem;
+        font-size: 0.9rem;
+    }
+    
+    /* 确保按钮在小屏幕上有足够空间 */
     .action-buttons {
         flex-direction: column;
+        width: 100%;
+    }
+    
+    .action-buttons button {
+        width: 100%;
+        margin-bottom: 0.3rem;
     }
 }
 
@@ -737,33 +770,52 @@ const deleteUser = async (userId: number) => {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.6);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1000;
+    backdrop-filter: blur(3px); /* 背景模糊效果 */
+    overflow-y: auto; /* 允许对话框内容滚动 */
 }
 
 .modal-content {
     background-color: var(--background-color);
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.3);
     width: 90%;
     max-width: 500px;
     overflow: hidden;
+    transform: translateY(0);
+    animation: modal-appear 0.3s ease;
+    max-height: 90vh; /* 设置最大高度 */
+    display: flex;
+    flex-direction: column;
+}
+
+@keyframes modal-appear {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .modal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem;
-    border-bottom: 1px solid #ddd;
+    padding: 1.2rem;
+    border-bottom: 1px solid var(--border-color, #444);
 }
 
 .modal-header h3 {
     margin: 0;
     color: var(--text-color);
+    font-size: 1.3rem;
 }
 
 .close-btn {
@@ -771,52 +823,92 @@ const deleteUser = async (userId: number) => {
     font-weight: bold;
     cursor: pointer;
     color: var(--text-color);
+    transition: color 0.2s;
+}
+
+.close-btn:hover {
+    color: var(--primary-color, #4e89e8);
 }
 
 .modal-body {
-    padding: 1rem;
+    padding: 1.2rem;
+    overflow-y: auto; /* 内容太多时允许滚动 */
+    flex: 1;
 }
 
 .form-group {
-    margin-bottom: 1rem;
-    font-family: var(--background-color);;
+    margin-bottom: 1.2rem;
 }
 
 .form-group label {
     display: block;
     margin-bottom: 0.5rem;
+    font-weight: 500;
 }
 
 .form-group input,
 .form-group select {
-    width: 97%;
-    padding: 0.5rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    background-color: var(--background-color, #f8f8f8);
+    width: 100%;
+    padding: 0.7rem;
+    border: 1px solid var(--border-color, #ddd);
+    border-radius: 6px;
+    background-color: var(--background-color);
     color: var(--text-color);
+    font-size: 0.95rem;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
 }
-input:focus{
-    border-color: #66afe9;
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: var(--primary-color, #4e89e8);
     outline: 0;
-    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6);
-    box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6)
+    box-shadow: 0 0 0 3px rgba(78, 137, 232, 0.25);
 }
 
 .modal-footer {
-    padding: 1rem;
+    padding: 1.2rem;
     display: flex;
     justify-content: flex-end;
-    gap: 0.5rem;
-    border-top: 1px solid #ddd;
+    gap: 0.8rem;
+    border-top: 1px solid var(--border-color, #444);
 }
 
-.btn {
+/* 响应式模态框 */
+@media (max-width: 576px) {
+    .modal-content {
+        width: 95%;
+        max-height: 95vh;
+    }
+    
+    .modal-body {
+        padding: 1rem;
+    }
+    
+    .form-group input,
+    .form-group select {
+        padding: 0.6rem;
+    }
+    
+    .modal-footer {
+        flex-direction: column-reverse;
+    }
+    
+    .modal-footer button {
+        width: 100%;
+    }
+}
+
+/* 添加用户按钮 */
+.add-btn {
+    background-color: var(--success-color, #28a745);
+    color: white;
     padding: 0.5rem 1rem;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 500;
+}
+
+.add-btn:hover {
+    background-color: var(--success-hover-color, #218838);
+    transform: translateY(-1px);
 }
 
 .cancel-btn {
@@ -832,16 +924,5 @@ input:focus{
 .logout-btn {
     background-color: var(--error-color, #e74c3c);
     color: white;
-}
-
-/* 添加用户按钮 */
-.add-btn {
-    background-color: var(--success-color, #28a745);
-    color: white;
-    padding: 0.5rem 1rem;
-}
-
-.add-btn:hover {
-    background-color: var(--success-hover-color, #218838);
 }
 </style>
