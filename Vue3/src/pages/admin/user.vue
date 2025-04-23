@@ -4,8 +4,11 @@
         <!-- 顶部标题和搜索区域 -->
         <div class="user-header">
             <h2>用户管理</h2>
-            <div class="search-box">
-                <input class="search-input" type="text" placeholder="搜索用户...(ID/用户名)" v-model="searchQuery">
+            <div class="search-actions">
+                <div class="search-box">
+                    <input class="search-input" type="text" placeholder="搜索用户...(ID/用户名)" v-model="searchQuery">
+                </div>
+                <button class="btn add-btn" @click="showAddModal = true">添加用户</button>
             </div>
         </div>
 
@@ -33,7 +36,7 @@
                         <td colspan="4" class="text-center">没有找到用户</td>
                     </tr>
                     <!-- 用户数据行 -->
-                    <tr v-for="user in filteredUsers" :key="user.id" class="user-row">
+                    <tr v-for="user in paginatedUsers" :key="user.id" class="user-row">
                         <td>{{ user.id }}</td>
                         <td>{{ user.username }}</td>
                         <td>{{ user.money }}</td>
@@ -54,11 +57,18 @@
         </div>
 
         <!-- 分页控件 -->
-        <div class="pagination" v-if="users.length > 10">
-            <button class="page-btn">&laquo;</button>
-            <button class="page-btn active">1</button>
-            <button class="page-btn">2</button>
-            <button class="page-btn">&raquo;</button>
+        <div class="pagination" v-if="users.length > 0">
+            <button class="page-btn" @click="goToPage(currentPage - 1)" :disabled="currentPage === 1">&laquo;</button>
+            <button 
+                v-for="page in displayedPageNumbers" 
+                :key="page" 
+                class="page-btn" 
+                :class="{ active: currentPage === page }"
+                @click="goToPage(page)"
+            >
+                {{ page }}
+            </button>
+            <button class="page-btn" @click="goToPage(currentPage + 1)" :disabled="currentPage === totalPages">&raquo;</button>
         </div>
     </div>
     <!-- 编辑用户对话框 -->
@@ -99,10 +109,49 @@
             </div>
         </div>
     </div>
+    
+    <!-- 添加用户对话框 -->
+    <div class="modal" v-if="showAddModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>添加用户</h3>
+                <span class="close-btn" @click="showAddModal = false">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>用户名</label>
+                    <input class="form-control" type="text" v-model="newUser.username" />
+                </div>
+                <div class="form-group">
+                    <label>邮箱</label>
+                    <input class="form-control" type="text" v-model="newUser.email"/>
+                </div>
+                <div class="form-group">
+                    <label>用户密码</label>
+                    <input class="form-control" type="text" v-model="newUser.password"/>
+                </div>
+                <div class="form-group">
+                    <label>账户余额 (默认: {{defaultMoney}})</label>
+                    <input class="form-control" type="number" v-model="newUser.money" />
+                </div>
+                <div class="form-group">
+                    <label>用户角色</label>
+                    <select class="form-control" v-model="newUser.userauth">
+                        <option value="0">普通用户</option>
+                        <option value="1">管理员</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn cancel-btn" @click="showAddModal = false">取消</button>
+                <button class="btn save-btn" @click="createUser">创建</button>
+            </div>
+        </div>
+    </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useUserConfig, useSystemConfig } from "@/store/dataconfig";
 import axios from 'axios';
 import { useRouter } from 'vue-router';
@@ -119,8 +168,54 @@ const loading = ref(true);
 const searchQuery = ref('');
 const password = ref('');
 
+// 分页相关状态
+const currentPage = ref(1);
+const pageSize = ref(10);
+const maxDisplayedPages = ref(5);
+
+// 默认余额
+const defaultMoney = ref(0);
+
 // 外部组件
 const messageAPI = message;
+
+// 计算总页数
+const totalPages = computed(() => {
+    return Math.ceil(filteredUsers.value.length / pageSize.value);
+});
+
+// 计算要显示的页码
+const displayedPageNumbers = computed(() => {
+    const pages = [];
+    let startPage = Math.max(1, currentPage.value - Math.floor(maxDisplayedPages.value / 2));
+    let endPage = Math.min(totalPages.value, startPage + maxDisplayedPages.value - 1);
+    
+    // 调整起始页，确保显示正确数量的页码
+    if (endPage - startPage + 1 < maxDisplayedPages.value) {
+        startPage = Math.max(1, endPage - maxDisplayedPages.value + 1);
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+        pages.push(i);
+    }
+    
+    return pages;
+});
+
+// 切换到指定页面
+const goToPage = (page: number) => {
+    if (page < 1 || page > totalPages.value) {
+        return;
+    }
+    currentPage.value = page;
+};
+
+// 根据当前页数和分页大小，获取用户列表的分页数据
+const paginatedUsers = computed(() => {
+    const start = (currentPage.value - 1) * pageSize.value;
+    const end = start + pageSize.value;
+    return filteredUsers.value.slice(start, end);
+});
 
 // 过滤后的用户列表 - 根据搜索关键词实时过滤
 const filteredUsers = computed(() => {
@@ -156,11 +251,97 @@ const editingUser = ref({
     username: '',
     email: '',
     money: 0,
-    authuser: 0
+    authuser: '0'
 });
 
-// 初始化：获取用户列表数据
-onMounted(async () => {
+// 添加用户状态
+const showAddModal = ref(false);
+const newUser = ref({
+    username: '',
+    email: '',
+    password: '',
+    money: 0,
+    userauth: '0'
+});
+
+// 监听搜索条件变化，重置到第一页
+watch(searchQuery, () => {
+    currentPage.value = 1;
+});
+
+// 获取默认余额
+const fetchDefaultMoney = async () => {
+    try {
+        const token = localStorage.getItem('JWTtoken');
+        if (!token) return;
+        
+        const response = await axios.get(`${systemConfig.baseurl}/admin/default-money`, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        if (response.data && response.data.default_money !== undefined) {
+            defaultMoney.value = response.data.default_money;
+            newUser.value.money = response.data.default_money;
+        }
+    } catch (error) {
+        messageAPI.error('获取默认余额失败: ' + error);
+    }
+};
+
+// 创建新用户
+const createUser = async () => {
+    try {
+        loading.value = true;
+        const token = localStorage.getItem('JWTtoken');
+        
+        // 验证表单数据
+        if (!newUser.value.username || !newUser.value.email || !newUser.value.password) {
+            messageAPI.error('请填写必要的信息');
+            loading.value = false;
+            return;
+        }
+        
+        // 调用管理员创建用户API
+        await axios.post(
+            `${systemConfig.baseurl}/admin/users`, 
+            {
+                username: newUser.value.username,
+                email: newUser.value.email,
+                password: newUser.value.password,
+                money: newUser.value.money,
+                userauth: parseInt(newUser.value.userauth)
+            },
+            {
+                headers: { Authorization: `Bearer ${token}` }
+            }
+        );
+        
+        // 重新加载用户列表
+        await fetchUsers();
+        
+        // 重置表单并关闭对话框
+        newUser.value = {
+            username: '',
+            email: '',
+            password: '',
+            money: defaultMoney.value,
+            userauth: '0'
+        };
+        showAddModal.value = false;
+        messageAPI.success('用户创建成功');
+    } catch (error: any) {
+        if (error.response) {
+            messageAPI.error(`创建用户失败: ${error.response.data.detail || '未知错误'}`);
+        } else {
+            messageAPI.error('创建用户失败: ' + error);
+        }
+    } finally {
+        loading.value = false;
+    }
+};
+
+// 重新加载用户列表
+const fetchUsers = async () => {
     try {
         const token = localStorage.getItem('JWTtoken');
         if (!token) {
@@ -168,37 +349,61 @@ onMounted(async () => {
             return;
         }
 
+        users.value = []; // 清空现有数据
+        
         // 获取用户列表数据
-        try {
-            const response = await axios.get(`${systemConfig.baseurl}/admin/users`, {
-               headers: { Authorization: `Bearer ${token}` }
+        const response = await axios.get(`${systemConfig.baseurl}/admin/users`, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        for (const user of response.data) {
+            users.value.push({
+                id: user.id,
+                username: user.username,
+                email: user.email,
+                money: user.money,
+                authuser: user.userauth
             });
-            for (const user of response.data) {
-                users.value.push({
-                    id: user.id,
-                    username: user.username,
-                    email: user.email,
-                    money: user.money,
-                    authuser: user.userauth
-                });
-            }
-            loading.value = false;
-          } catch (error) {
-            messageAPI.error('获取用户数据失败:' + error);
-            loading.value = false;
         }
     } catch (error) {
-        messageAPI.error('初始化失败:' + error);
+        messageAPI.error('获取用户数据失败: ' + error);
+    }
+};
+
+// 初始化函数
+const initialize = async () => {
+    loading.value = true;
+    try {
+        const token = localStorage.getItem('JWTtoken');
+        if (!token) {
+            router.push('/login');
+            return;
+        }
+
+        // 获取默认余额
+        await fetchDefaultMoney();
+        
+        // 获取用户列表
+        await fetchUsers();
+    } catch (error) {
+        messageAPI.error('初始化失败: ' + error);
+    } finally {
         loading.value = false;
     }
-});
+};
+
+// 初始化：获取用户列表数据
+onMounted(initialize);
 
 const editUser = (userId: number) => {
     // 找到要编辑的用户
     const userToEdit = users.value.find(user => user.id === userId);
     if (userToEdit) {
         // 复制用户数据到编辑用户对象
-        editingUser.value = { ...userToEdit };
+        editingUser.value = { 
+            ...userToEdit,
+            authuser: userToEdit.authuser.toString()
+        };
         // 显示编辑对话框
         showEditModal.value = true;
     }
@@ -219,7 +424,7 @@ const saveUserChanges = async () => {
                 email: editingUser.value.email,
                 password: password.value,
                 money: editingUser.value.money,
-                userauth: editingUser.value.authuser
+                userauth: parseInt(editingUser.value.authuser)
             },
             {
                 headers: { Authorization: `Bearer ${token}` }
@@ -230,14 +435,14 @@ const saveUserChanges = async () => {
         const index = users.value.findIndex(user => user.id === editingUser.value.id);
         if (index !== -1) {
             users.value[index].money = editingUser.value.money;
-            users.value[index].authuser = editingUser.value.authuser;
+            users.value[index].authuser = parseInt(editingUser.value.authuser);
         }
         
         // 关闭对话框
         showEditModal.value = false;
         messageAPI.success('用户信息已更新');
-    } catch (error) {
-        messageAPI.error('更新用户信息失败:' + error);
+    } catch (error: any) {
+        messageAPI.error('更新用户信息失败:' + (error.response?.data?.detail || error));
     } finally {
         loading.value = false;
     }
@@ -483,6 +688,19 @@ const deleteUser = async (userId: number) => {
     color: var(--text-color, #fff);
     cursor: pointer;
     border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+/* 禁用状态的按钮 */
+.page-btn[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* 分页按钮悬停效果 */
+.page-btn:not([disabled]):hover {
+    background-color: var(--hover-bg, rgba(13, 110, 253, 0.1));
+    border-color: var(--primary-color, #0d6efd);
 }
 
 /* 当前活动页按钮 */
@@ -614,5 +832,16 @@ input:focus{
 .logout-btn {
     background-color: var(--error-color, #e74c3c);
     color: white;
+}
+
+/* 添加用户按钮 */
+.add-btn {
+    background-color: var(--success-color, #28a745);
+    color: white;
+    padding: 0.5rem 1rem;
+}
+
+.add-btn:hover {
+    background-color: var(--success-hover-color, #218838);
 }
 </style>
