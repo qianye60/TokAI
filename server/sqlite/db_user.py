@@ -6,6 +6,7 @@ from model.chat_model import ChatDB
 from fastapi import status, HTTPException
 from tools.token import get_password_hash
 from uuid import uuid4
+from .db_config import get_config
 
 default_M = 0
 
@@ -67,12 +68,16 @@ async def create_user(user:UserDB) -> str | bool :
         if email_exists:
             return "2"
         
+        # 获取系统配置中的默认余额
+        config = await get_config()
+        default_money = config.default_money if config and config.default_money is not None else default_M
+        
         # 创建新用户
         db_user = User(
             username=user.username,
             email=user.email,
             hashed_password=user.hashed_password,
-            money=0,
+            money=default_money,
             userauth=0
         )
         session.add(db_user)
