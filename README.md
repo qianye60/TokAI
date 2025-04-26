@@ -187,8 +187,8 @@ TokAI 是一个现代化的全栈智能对话助手应用，提供流畅的对�
 
 ```bash
 # 1. 克隆项目
-git clone <your-repo-url>
-cd <project-root-directory>
+git clone https://github.com/qianye60/TokAI.git
+cd TokAI
 
 # 2. 启动后端 (假设在项目根目录)
 #    (根据你的后端设置，可能需要先创建虚拟环境并安装依赖)
