@@ -192,6 +192,18 @@ html, body {
   --text-ground: #FFFFFF;
   --background-sidebar:#666666;
   --linear-gradient:linear-gradient(45deg, #9f9f9f, #d9d9d9dc);
+  /* 新增颜色变量 */
+  --primary-color: #3498db;
+  --primary-hover: #2980b9;
+  --success-color: #2ecc71;
+  --success-hover: #27ae60;
+  --danger-color: #e74c3c;
+  --danger-hover: #c0392b;
+  --warning-color: #f39c12;
+  --warning-hover: #d35400;
+  --info-color: #3498db;
+  --info-hover: #2980b9;
+  --border-color: #dee2e6;
 }
 
 :root[data-theme="dark"] {
@@ -200,6 +212,18 @@ html, body {
   --text-ground: #212121;
   --background-sidebar:#696969;
   --linear-gradient:linear-gradient(135deg, #3a3a3a, #202020);
+  /* 新增暗色主题的颜色变量 */
+  --primary-color: #3498db;
+  --primary-hover: #2980b9;
+  --success-color: #2ecc71;
+  --success-hover: #27ae60;
+  --danger-color: #e74c3c;
+  --danger-hover: #c0392b;
+  --warning-color: #f39c12;
+  --warning-hover: #d35400;
+  --info-color: #3498db;
+  --info-hover: #2980b9;
+  --border-color: #444;
 }
 
 body {

@@ -125,7 +125,7 @@ import INput from "@/pages/chat/input.vue"         // 输入框组件
 import Lside from "@/pages/chat/chatManage.vue"    // 左侧聊天管理组件
 import { Bubble } from 'ant-design-x-vue';         // 气泡组件
 import { useConversationStore } from "@/store/dataconfig.ts"; // 对话管理存储
-import { watch, nextTick, ref, h } from 'vue';        // Vue核心函数
+import { watch, nextTick, ref, h, onMounted } from 'vue';        // Vue核心函数
 import { message, Modal, Avatar } from 'ant-design-vue';          // 导入message服务
 import { UserOutlined } from '@ant-design/icons-vue';
 import { useUserConfig, useSystemConfig } from "@/store/dataconfig.ts"; // 导入用户配置store
@@ -153,6 +153,9 @@ const tobottom = () => {
   if(chatAreaRef.value) chatAreaRef.value.scrollTop = chatAreaRef.value.scrollHeight;
   return ;
 }
+onMounted(()=>{
+  chatAreaRef.value.scrollTop = chatAreaRef.value.scrollHeight;
+})
 
 // 头像样式
 const userAvatarStyle = {

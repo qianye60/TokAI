@@ -21,7 +21,7 @@ export const useSystemConfig = defineStore(
   "systemConfig",
   () => {
     const theme = ref(false)
-    const baseurl = ref("") // API 基础URL/后端 - 在Docker环境中通过Nginx代理
+    const baseurl = ref("") //后端http://127.0.0.1:40000 - 在Docker环境中通过Nginx代理
     const message_max = ref(8);
     const title = ref("")
     const emailregister = ref(false);

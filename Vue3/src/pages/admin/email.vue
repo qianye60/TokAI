@@ -161,7 +161,6 @@ onMounted(() => {
     font-size: 24px;
     font-weight: bold;
     margin-bottom: 30px;
-    border-bottom: 1px solid #eee;
     padding-bottom: 10px;
 }
 

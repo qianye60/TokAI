@@ -549,7 +549,6 @@ const deselectAllModels = () => {
   align-items: center;
   margin-bottom: 32px;
   padding-bottom: 16px;
-  border-bottom: 1px solid var(--border-color, #eaeaea);
 }
 
 .admin-title {
