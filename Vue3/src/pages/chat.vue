@@ -150,11 +150,15 @@ let content = ref()
 const hoveredMessageIndex = ref<string | null>(null);
 
 const tobottom = () => {
-  if(chatAreaRef.value) chatAreaRef.value.scrollTop = chatAreaRef.value.scrollHeight;
-  return ;
-}
+  if (chatAreaRef.value) {
+    chatAreaRef.value.scrollTop = chatAreaRef.value.scrollHeight;
+  }
+};
+
 onMounted(()=>{
-  chatAreaRef.value.scrollTop = chatAreaRef.value.scrollHeight;
+  if (chatAreaRef.value) {
+    chatAreaRef.value.scrollTop = chatAreaRef.value.scrollHeight;
+  }
 })
 
 // 头像样式
