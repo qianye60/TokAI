@@ -63,22 +63,22 @@ router.push("/setting/modconfig")
   justify-content: flex-start;
   align-items: center;
   width: 85%;
-  height: 50px;
-  background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
+  height: 52px;
+  background-color: rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
   margin: 10px 0;
-  padding: 0 15px;
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  padding: 0 18px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
   text-decoration: none;
-  backdrop-filter: blur(5px);
+  backdrop-filter: blur(8px);
 }
 
 .sidebar-item:hover {
-  background-color: rgba(255, 255, 255, 0.2);
-  transform: translateY(-3px);
-  box-shadow: 0 7px 14px rgba(0, 0, 0, 0.2);
+  background-color: rgba(255, 255, 255, 0.25);
+  transform: translateX(5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
 }
 
 .sidebar-item::before {
@@ -99,8 +99,9 @@ router.push("/setting/modconfig")
 }
 
 .sidebar-item.router-link-active {
-  background-color: rgba(255, 255, 255, 0.25);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  background-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  transform: translateX(5px);
 }
 
 .item-span {
@@ -128,11 +129,11 @@ router.push("/setting/modconfig")
   right: 15px;
   top: 15px;
   bottom: 15px;
-  padding: 30px;
+  padding: 32px;
   overflow-y: auto;
   background-color: var(--background-color);
-  border-radius: 20px 0 0 20px;
-  box-shadow: -5px 0 20px rgba(0, 0, 0, 0.05);
+  border-radius: 24px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
 }
 
 /* 手机端样式适配 */

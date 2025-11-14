@@ -1,6 +1,8 @@
 <template>
   <div class="page-container">
     <div class="auth-container" :class="{ 'hover-effect': isHovered }" @mouseenter="isHovered = true" @mouseleave="isHovered = false">
+      <!-- 标题 -->
+      <div class="app-title">TokAI</div>
       <!-- 标签切换 -->
       <div class="auth-tabs">
         <div class="tab-btn" :class="{ active: activeTab === 'login' }" @click="activeTab = 'login'">
@@ -376,17 +378,30 @@ watch(activeTab, () => {
   width: 420px;
   max-width: 90%;
   background-color: #ffffff;
-  border-radius: 16px;
+  border-radius: 20px;
   overflow: hidden;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   transition: all 0.3s ease;
   position: relative;
 }
 
+/* 标题样式 */
+.app-title {
+  padding: 32px 0 24px;
+  text-align: center;
+  font-size: 36px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 2px;
+}
+
 /* 悬停效果 */
 .auth-container.hover-effect {
-  transform: translateY(-5px);
-  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.4);
+  transform: translateY(-8px);
+  box-shadow: 0 30px 80px rgba(102, 126, 234, 0.4);
 }
 @media (max-width: 768px) {
   .auth-container {
@@ -398,7 +413,7 @@ watch(activeTab, () => {
 .auth-tabs {
   display: flex;
   background-color: #f8f9fa;
-  border-bottom: 2px solid #e9ecef;
+  border-bottom: 1px solid #e9ecef;
 }
 
 .tab-btn {
@@ -424,10 +439,10 @@ watch(activeTab, () => {
 .tab-btn.active::after {
   content: '';
   position: absolute;
-  bottom: -2px;
+  bottom: -1px;
   left: 0;
   width: 100%;
-  height: 3px;
+  height: 2px;
   background: linear-gradient(90deg, #667eea, #764ba2);
 }
 

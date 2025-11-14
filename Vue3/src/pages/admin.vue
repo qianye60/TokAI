@@ -67,11 +67,11 @@ router.push("/admin/user")
     display: flex;
     flex-direction: column;
     background-color: var(--background-color);
-    box-shadow: 1px 0px 2px 2px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
     gap: 0.7rem;
     position: relative;
     z-index: 1;
-    border-radius: 15px;
+    border-radius: 20px;
 }
 
 .admin-title {
@@ -85,24 +85,25 @@ router.push("/admin/user")
 }
 
 .admin-item-box {
-    padding: 0.8rem 1rem;
-    margin: 0 0.4rem 0 0;
+    padding: 0.9rem 1.2rem;
+    margin: 0 0.6rem;
     display: flex;
     align-items: center;
     cursor: pointer;
-    border-radius: 10px;
-    transition: all 0.25s ease;
+    border-radius: 12px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .admin-item-box:hover {
-    background-color: rgba(86, 168, 255, 0.438);
-    transform: translateX(3px);
-    box-shadow: inset 1px 2px rgba(1,1,1,0.4);
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+    transform: translateX(5px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
 }
 
 .admin-item-box.active {
-    background-color: rgba(86, 168, 255, 0.872);
-    border-left: 3px solid #83b9ff;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(118, 75, 162, 0.15));
+    border-left: 4px solid #667eea;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
 }
 
 .admin-sidebar-item {
@@ -117,11 +118,11 @@ router.push("/admin/user")
     flex: 1;
     width: 82%;
     height: 100%;
-    padding: 1.5rem;
+    padding: 2rem;
     background-color: var(--background-color);
-    border-radius: 20px;
-    box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, 0.15);
-    overflow-y: auto; /* 允许内容滚动 */
+    border-radius: 24px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    overflow-y: auto;
 }
 
 /* 改进移动端适配 */

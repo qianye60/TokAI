@@ -200,16 +200,16 @@ onMounted(() => {
 }
 .user-card {
   background-color: var(--text-ground, white);
-  border-radius: 16px;
-  padding: 2rem;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  border-radius: 24px;
+  padding: 2.5rem;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.06);
   min-width: 380px;
-  transition: transform .3s, box-shadow .3s;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .user-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+  transform: translateY(-8px);
+  box-shadow: 0 16px 48px rgba(102, 126, 234, 0.15);
 }
 
 .card-header {
@@ -221,21 +221,27 @@ onMounted(() => {
 }
 
 .avatar {
-  width: 80px;
-  height: 80px;
+  width: 90px;
+  height: 90px;
   margin-bottom: 1rem;
   border-radius: 50%;
-  background: linear-gradient(135deg, #edff47, #00fff2);
+  background: linear-gradient(135deg, #667eea, #764ba2);
   display: flex;
   justify-content: center;
   align-items: center;
   color: white;
-  font-size: 32px;
+  font-size: 36px;
   font-weight: bold;
-  box-shadow: 0 5px 15px rgba(107,142,251,0.4);
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
   overflow: hidden;
   cursor: pointer;
   position: relative;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.avatar:hover {
+  transform: scale(1.05);
+  box-shadow: 0 12px 32px rgba(102, 126, 234, 0.4);
 }
 
 .avatar img {
@@ -361,17 +367,19 @@ h2 {
 
 .field input {
   width: 95%;
-  padding: 0.8rem;
-  border: 1px solid rgba(0,0,0,0.1);
-  border-radius: 8px;
+  padding: 0.9rem 1rem;
+  border: 2px solid rgba(0,0,0,0.08);
+  border-radius: 12px;
   background-color: #f5f7fa;
   font-size: 1rem;
+  transition: all 0.3s ease;
 }
 
 .field input:focus {
   outline: none;
-  border-color: #6e8efb;
-  box-shadow: 0 0 0 3px rgba(110,142,251,0.2);
+  border-color: #667eea;
+  background-color: white;
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
 }
 
 .btns {
@@ -382,24 +390,32 @@ h2 {
 }
 
 button {
-  padding: 0.6rem 1.2rem;
+  padding: 0.7rem 1.5rem;
   border: none;
-  border-radius: 8px;
-  font-weight: 500;
+  border-radius: 12px;
+  font-weight: 600;
   cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .cancel {
   background-color: #e2e8f0;
   color: #4a5568;
 }
-.cancel:hover { background-color: #cbd5e0; }
+.cancel:hover {
+  background-color: #cbd5e0;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
 
 .save {
-  background-color: #6e8efb;
+  background: linear-gradient(135deg, #667eea, #764ba2);
   color: white;
 }
-.save:hover { background-color: #5a78e6; }
+.save:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
 
 /* 消息提示 */
 .msg {

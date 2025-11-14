@@ -19,10 +19,10 @@
               @mouseleave="hoveredMessageIndex = null"
               :styles="{
                 content: {
-                  backgroundColor: systemStore.theme?'rgba(0, 0, 0, 0.60)':'rgba(255, 255, 255, 0.80)',
-                  borderRadius: '12px',
-                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-                  backdropFilter: 'blur(5px)',
+                  backgroundColor: systemStore.theme?'rgba(0, 0, 0, 0.60)':'rgba(255, 255, 255, 0.95)',
+                  borderRadius: '16px',
+                  boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)',
+                  backdropFilter: 'blur(10px)',
                   maxWidth: '100%',
                   wordBreak: 'break-word',
                 }
@@ -411,15 +411,15 @@ const deleteMessage = async (messageId: string) => {
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  background: var(--text-ground);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  transition: all 0.3s ease;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 1000;
 }
 
 .tobottom:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
 }
 
 /* 手机端适配 */
@@ -474,14 +474,14 @@ const deleteMessage = async (messageId: string) => {
   background: none;
   border: none;
   cursor: pointer;
-  padding: 0.3rem 0.5rem;
-  border-radius: 8px;
+  padding: 0.4rem 0.6rem;
+  border-radius: 10px;
   color: var(--text-color);
   display: flex;
   align-items: center;
   justify-content: center;
   opacity: 0.7;
-  transition: all 0.3s ease, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
   
 .action-icon {
@@ -495,37 +495,37 @@ const deleteMessage = async (messageId: string) => {
 /* 复制按钮悬停样式 */
 .copy-btn:hover {
   color: #1890ff;
-  background-color: rgba(24, 144, 255, 0.1);
-  transform: scale(1.1);
+  background: linear-gradient(135deg, rgba(24, 144, 255, 0.15), rgba(24, 144, 255, 0.05));
+  transform: translateY(-2px);
   opacity: 1;
-  box-shadow: 0 2px 6px rgba(24, 144, 255, 0.2);
+  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.25);
 }
-  
+
 /* 编辑按钮悬停样式 */
 .edit-btn:hover {
   color: #fa8c16;
-  background-color: rgba(250, 140, 22, 0.1);
-  transform: scale(1.1);
+  background: linear-gradient(135deg, rgba(250, 140, 22, 0.15), rgba(250, 140, 22, 0.05));
+  transform: translateY(-2px);
   opacity: 1;
-  box-shadow: 0 2px 6px rgba(250, 140, 22, 0.2);
+  box-shadow: 0 4px 12px rgba(250, 140, 22, 0.25);
 }
-  
+
 /* 删除按钮悬停样式 */
 .delete-btn:hover {
   color: #ff4d4f;
-  background-color: rgba(255, 77, 79, 0.1);
-  transform: scale(1.1);
+  background: linear-gradient(135deg, rgba(255, 77, 79, 0.15), rgba(255, 77, 79, 0.05));
+  transform: translateY(-2px);
   opacity: 1;
-  box-shadow: 0 2px 6px rgba(255, 77, 79, 0.2);
+  box-shadow: 0 4px 12px rgba(255, 77, 79, 0.25);
 }
-  
+
 /* 重新生成按钮悬停样式 */
 .regenerate-btn:hover {
   color: #52c41a;
-  background-color: rgba(82, 196, 26, 0.1);
-  transform: scale(1.1);
+  background: linear-gradient(135deg, rgba(82, 196, 26, 0.15), rgba(82, 196, 26, 0.05));
+  transform: translateY(-2px);
   opacity: 1;
-  box-shadow: 0 2px 6px rgba(82, 196, 26, 0.2);
+  box-shadow: 0 4px 12px rgba(82, 196, 26, 0.25);
 }
   
 /* 深色模式适配 */
