@@ -22,7 +22,7 @@ if not SECRET_KEY:
     raise ValueError("必须提供 SECRET_KEY 环境变量！")
 
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto", bcrypt__max_password_size=72)
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
