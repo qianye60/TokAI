@@ -22,7 +22,7 @@ if not SECRET_KEY:
     raise ValueError("必须提供 SECRET_KEY 环境变量！")
 
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto", bcrypt__ident="2b")
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
@@ -30,12 +30,12 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 #验证用户密码是否与数据库哈希密码匹配
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return pwd_context.verify(plain_password, hashed_password)
+    return pwd_context.verify(plain_password[:72], hashed_password)
 
 
 #密码加密哈希
 def get_password_hash(password: str) -> str:
-    return pwd_context.hash(password)
+    return pwd_context.hash(password[:72])
 
 
 #认证用户存在且账号密码正确

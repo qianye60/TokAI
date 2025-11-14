@@ -298,7 +298,7 @@ async function register() {
 async function login() {
   const formData = new FormData();
   formData.append('username', dataUserName.value);
-  formData.append('password', dataPassword.value);
+  formData.append('password', dataPassword.value.slice(0, 72));
   try {
     const response = await axios.post(systemConfig.baseurl + '/user/token', formData);
     if (response.data["error"] == "None"){
@@ -389,8 +389,8 @@ watch(activeTab, () => {
   box-shadow: 0 25px 70px rgba(0, 0, 0, 0.4);
 }
 @media (max-width: 768px) {
-  .page-container {
-    width: 80%;
+  .auth-container {
+    width: 90%;
   }
 }
 
