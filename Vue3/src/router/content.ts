@@ -143,39 +143,32 @@ const checkLoginStatus = async () => {
  * 拦截需要登录的页面，检查用户登录状态
  */
 chat_router.beforeEach(async (to, from) => {
-    // 通过登录检测，获取用户是否已登录
-    const userauth = await checkLoginStatus()
-    
-    // 路由访问控制 - 处理需要登录的页面
-    if (to.meta.requiresAuth && !userauth.islogin) {
-        // 未登录时保存目标路由并跳转到登录页
-        if (to.path !== '/') {
+    const userConfig = useUserConfig()
+
+    // 如果访问登录页，直接放行
+    if (to.name === 'login_') {
+        return true
+    }
+
+    // 检查是否需要登录
+    if (to.meta.requiresAuth) {
+        const userauth = await checkLoginStatus()
+
+        if (!userauth.islogin) {
+            // 未登录，保存目标路由并跳转到登录页
             sessionStorage.setItem("lastRoute", to.fullPath)
+            message.warning('请先登录!')
+            return { name: 'login_' }
         }
-        message.warning('请先登录!')
-        return { name: 'login_' }
-    } 
-    // 管理员权限验证 - 处理需要管理员权限的页面
-    else if (to.meta.adminAuth && userauth.islogin) {
-        if (!userauth.userauth) {
+
+        // 更新本地登录状态
+        userConfig.setLoginStatus(true)
+
+        // 检查管理员权限
+        if (to.meta.adminAuth && !userauth.userauth) {
             message.warning('您没有管理员权限!')
             return { name: 'home' }
         }
-    }
-    // 已登录用户访问登录页的处理
-    else if (to.name === 'login_' && userauth.islogin) {
-        // 已登录用户访问登录页，检查是否有保存的路由
-        const savedRoute = sessionStorage.getItem("lastRoute")
-        if (savedRoute) {
-            sessionStorage.removeItem("lastRoute")
-            return savedRoute
-        }
-        return { name: 'home' }
-    }
-    
-    // 保存非登录页面的路由，用于刷新恢复
-    if (to.path !== '/login') {
-        sessionStorage.setItem("lastRoute", to.fullPath)
     }
 })
 

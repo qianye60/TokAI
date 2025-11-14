@@ -303,35 +303,45 @@ async function login() {
     const response = await axios.post(systemConfig.baseurl + '/user/token', formData);
     if (response.data["error"] == "None"){
       messageAPI.error("没有该用户！")
-      return false
+      return
     }
-    else{
-      const token = response.data.token.access_token; //还需要接收用户消息，聊天记录
-      localStorage.setItem('JWTtoken', token);
-      messageAPI.success("登陆成功！")
-      const UserConfig = response.data.user
-      //信息同步
-      userStore.userinfo.userID = UserConfig.userinfo.id;
-      userStore.userinfo.username = UserConfig.userinfo.username;
-      userStore.userinfo.email = UserConfig.userinfo.email;
-      userStore.userinfo.money = UserConfig.userinfo.money;
-      userStore.userinfo.userauth = UserConfig.userinfo.userauth;
 
-      //聊天同步
-      conversationStore.conversations = UserConfig.chats
-      userStore.setLoginStatus(true);
-      
-       // 如果有对话记录，选择第一个对话，否则创建新对话
-      if (UserConfig.chats && UserConfig.chats.length > 0) {
-        conversationStore.selectConversation(UserConfig.chats[0].id);
-      } else {
-        await conversationStore.createNewConversation();
-      }
+    const token = response.data.token.access_token;
+    const UserConfig = response.data.user
+
+    // 保存token
+    localStorage.setItem('JWTtoken', token);
+
+    // 同步用户信息
+    userStore.userinfo.userID = UserConfig.userinfo.id;
+    userStore.userinfo.username = UserConfig.userinfo.username;
+    userStore.userinfo.email = UserConfig.userinfo.email;
+    userStore.userinfo.money = UserConfig.userinfo.money;
+    userStore.userinfo.userauth = UserConfig.userinfo.userauth;
+
+    // 同步聊天记录
+    conversationStore.conversations = UserConfig.chats
+
+    // 选择或创建对话
+    if (UserConfig.chats && UserConfig.chats.length > 0) {
+      conversationStore.selectConversation(UserConfig.chats[0].id);
+    } else {
+      await conversationStore.createNewConversation();
     }
-    
-    
-    // 使用正确的状态管理
-    router.push('/');
+
+    // 设置登录状态
+    userStore.setLoginStatus(true);
+
+    messageAPI.success("登录成功！")
+
+    // 跳转到保存的路由或首页
+    const savedRoute = sessionStorage.getItem("lastRoute")
+    if (savedRoute && savedRoute !== '/login') {
+      sessionStorage.removeItem("lastRoute")
+      router.push(savedRoute)
+    } else {
+      router.push('/')
+    }
   } catch (error: any) {
     messageAPI.error(`登录失败:密码错误！`);
   }
@@ -357,45 +367,26 @@ watch(activeTab, () => {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background-color: var(--background-color);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 20px;
 }
 
 /* 认证容器 */
 .auth-container {
-  width: 400px; /* 固定宽度 */
-  background-color: #121212;
-  border-radius: 12px;
+  width: 420px;
+  max-width: 90%;
+  background-color: #ffffff;
+  border-radius: 16px;
   overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   transition: all 0.3s ease;
   position: relative;
 }
 
 /* 悬停效果 */
 .auth-container.hover-effect {
-  box-shadow: 0 0 20px 10px rgba(0, 255, 200, 0.3);
-}
-
-.auth-container.hover-effect::before {
-  content: '';
-  position: absolute;
-  top: -2px;
-  left: -2px;
-  right: -2px;
-  bottom: -2px;
-  background: linear-gradient(45deg, #00e5cc, #2979ff);
-  border-radius: 14px;
-  z-index: -1;
-  animation: borderAnimation 3s linear infinite;
-}
-
-@keyframes borderAnimation {
-  0% {
-    filter: hue-rotate(0deg);
-  }
-  100% {
-    filter: hue-rotate(360deg);
-  }
+  transform: translateY(-5px);
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.4);
 }
 @media (max-width: 768px) {
   .page-container {
@@ -406,37 +397,38 @@ watch(activeTab, () => {
 /* 标签切换样式 */
 .auth-tabs {
   display: flex;
-  background-color: #121212;
-  border-bottom: 1px solid #333;
+  background-color: #f8f9fa;
+  border-bottom: 2px solid #e9ecef;
 }
 
 .tab-btn {
   flex: 1;
-  padding: 15px 0;
+  padding: 16px 0;
   text-align: center;
   font-size: 16px;
-  color: #999;
+  font-weight: 500;
+  color: #6c757d;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .tab-btn.active {
-  color: #fff;
+  color: #667eea;
   position: relative;
+  background-color: #fff;
 }
 
 .tab-btn.active::after {
   content: '';
   position: absolute;
-  bottom: 0;
-  left: 25%;
-  width: 50%;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
   height: 3px;
-  background: linear-gradient(90deg, #00e5cc, #2979ff);
-  border-radius: 3px 3px 0 0;
+  background: linear-gradient(90deg, #667eea, #764ba2);
 }
 
 /* 表单内容包装器 - 确保两个表单占用相同的空间 */
@@ -454,9 +446,9 @@ watch(activeTab, () => {
 
 .form-title {
   margin: 0 0 24px;
-  font-size: 20px;
-  font-weight: normal;
-  color: #fff;
+  font-size: 24px;
+  font-weight: 600;
+  color: #2d3748;
   text-align: center;
 }
 
@@ -475,7 +467,8 @@ watch(activeTab, () => {
 
 .form-group label {
   font-size: 14px;
-  color: #ccc;
+  font-weight: 500;
+  color: #4a5568;
 }
 
 .input-with-icon {
@@ -488,7 +481,7 @@ watch(activeTab, () => {
   left: 12px;
   top: 50%;
   transform: translateY(-50%);
-  color: #777;
+  color: #a0aec0;
   font-size: 16px;
 }
 
@@ -496,23 +489,23 @@ watch(activeTab, () => {
   width: 100%;
   height: 44px;
   padding: 0 12px 0 36px;
-  border: none;
+  border: 2px solid #e2e8f0;
   border-radius: 8px;
   font-size: 14px;
-  color: #fff;
-  background-color: #222;
+  color: #2d3748;
+  background-color: #fff;
   box-sizing: border-box;
   transition: all 0.2s ease;
 }
 
 .form-input:focus {
   outline: none;
-  background-color: #2a2a2a;
-  box-shadow: 0 0 0 2px rgba(0, 229, 204, 0.2);
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
 .form-input::placeholder {
-  color: #777;
+  color: #a0aec0;
 }
 
 /* 邮箱输入框和验证码按钮容器 */
@@ -528,8 +521,8 @@ watch(activeTab, () => {
 .verification-btn {
   min-width: 100px;
   height: 44px;
-  background: linear-gradient(90deg, #00e5cc, #2979ff);
-  color: #121212;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: #fff;
   border: none;
   border-radius: 8px;
   font-size: 14px;
@@ -540,13 +533,13 @@ watch(activeTab, () => {
 }
 
 .verification-btn:hover:not(:disabled) {
-  background: linear-gradient(90deg, #00ccb4, #2563eb);
   transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
 
 .verification-btn:disabled {
-  background: #333;
-  color: #777;
+  background: #cbd5e0;
+  color: #718096;
   cursor: not-allowed;
 }
 
@@ -556,35 +549,35 @@ watch(activeTab, () => {
   right: 12px;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 14px;
-  color: #777;
+  font-size: 12px;
+  color: #667eea;
   cursor: pointer;
   user-select: none;
+  font-weight: 500;
 }
 
 .toggle-password-btn:hover {
-  color: #00e5cc;
+  color: #764ba2;
 }
 
 /* 提交按钮 */
 .submit-btn {
   width: 100%;
-  height: 44px;
+  height: 48px;
   margin-top: 10px;
   border: none;
   border-radius: 8px;
   font-size: 16px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  background: linear-gradient(90deg, #00e5cc, #2979ff);
-  color: #121212;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: #fff;
 }
 
 .submit-btn:hover {
-  background: linear-gradient(90deg, #00ccb4, #2563eb);
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(0, 229, 204, 0.3);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
 }
 
 /* 表单底部 */
@@ -595,13 +588,13 @@ watch(activeTab, () => {
 
 .forgot-password {
   font-size: 14px;
-  color: #00e5cc;
+  color: #667eea;
   text-decoration: none;
   transition: all 0.2s ease;
 }
 
 .forgot-password:hover {
-  color: #2979ff;
+  color: #764ba2;
   text-decoration: underline;
 }
 </style>
